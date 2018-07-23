@@ -7,13 +7,13 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="hipku.js" type="text/javascript"></script>
 	<script>
-	storage = {}
-	storage["string"] = ''
+	//localStorage = {}
+	//localStorage["string"] = ''
 	function reload()
 	{
 		elem = $("#news");
 		output = "";
-		var storeddates = storage["string"];
+		var storeddates = localStorage["string"];
 		var dates = [];
 		temp="";
 		var count = 0;
@@ -31,7 +31,7 @@
 	}		
 			for (i = count-1; i >= 0; i--){
 			
-				output = output + "<p>" + storage[dates[i]] + "</p>\n";
+				output = output + "<p>" + localStorage[dates[i]] + "</p>\n";
 			}
 		elem.html(output);
 	}
@@ -120,9 +120,9 @@
 		haiku = generate_haiku($("#msg").val())
 	    date = Date.now();
 		text = date+ " - " +haiku;
-		storage[date] = text;
-		storage["string"] = storage["string"]+ JSON.stringify(date)+ ".";
-		console.log(storage["string"])
+		localStorage[date] = text;
+		localStorage["string"] = localStorage["string"]+ JSON.stringify(date)+ ".";
+		console.log(localStorage["string"])
 		reload();
 	}
 	
