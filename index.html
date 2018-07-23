@@ -5,12 +5,15 @@
 <head>
 	<title>My News Feed</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="hipku.js" type="text/javascript"></script>
 	<script>
+	storage = {}
+	storage["string"] = ''
 	function reload()
 	{
 		elem = $("#news");
 		output = "";
-		var storeddates = localStorage["string"];
+		var storeddates = storage["string"];
 		var dates = [];
 		temp="";
 		var count = 0;
@@ -28,19 +31,98 @@
 	}		
 			for (i = count-1; i >= 0; i--){
 			
-				output = output + "<p>" + localStorage[dates[i]] + "</p>\n";
+				output = output + "<p>" + storage[dates[i]] + "</p>\n";
 			}
 		elem.html(output);
 	}
+
+	function getRandomInt(min, max) {
+  		min = Math.ceil(min);
+  		max = Math.floor(max);
+  		return (Math.floor(Math.random() * (max - min + 1)) + min); //The maximum is inclusive and the minimum is inclusive 
+	}
+
+	function format_single_digit(digit) {
+        //add a zero if value single digit
+            if (parseInt(digit, 16) < 0xf){
+                formatted_digit ="0"+digit
+            }
+            else{
+                formatted_digit = digit
+            }
+
+            return formatted_digit
 	
+    }
+	function format_as_ip(orig_val) {
+            new_val = ""
+            for (var i = 1; i < 32; i++) {
+                
+                if ((i % 4) == 0){
+                    new_val += orig_val[(i-1)] + ":"
+                }
+                else{
+                    new_val += orig_val[(i-1)]
+                }
+            }
+            return new_val
+    }
+	function generate_haiku(command)
+	{
+ 			//generate random 1 byte pad
+            pad_str = getRandomInt(0x00, 0xff).toString(16) //base16
+            pad_val = parseInt(pad_str, 16) //base 10
+
+            //if within 128 bits ie 32 digits
+            if (length <= 32) {
+            	text = []
+            	for (var i = 0; i < command.length; i++){  
+   				 hexString = command.charCodeAt(i).toString(16);
+				 text.push(hexString)
+				}
+
+                encoded_text = ''
+                //separate hex digits into sets of 2
+                console.log(text)
+                //xor val with pad
+                for (i = 0; i < text.length; i++) {
+                	  encoded_text +=format_single_digit((text[i] ^ pad_val).toString(16))
+                     
+                 }    
+                //value 80 is 1 more than hex value for highest hex ascii value
+                //represents END of message
+                encoded_text += "80"
+
+                encoded_text += format_single_digit(pad_str)
+
+                //add remaining random digits
+                //todo inclusive or exclusive
+                vals_to_add = 32 - length - 2
+                for (i = 1; i <=  vals_to_add; i++) {
+
+                   encoded_text += getRandomInt(33, 127).toString(16)
+                }
+                          
+                //format as ipv6 address
+                encoded_text = format_as_ip(encoded_text)
+                //encode as haiku
+                console.log(encoded_text)
+              //  haiku = Hipku.encode(String.fromCharCode(encoded_text))
+                haiku = Hipku.encode((encoded_text))
+                return haiku
+
+             
+	}
+}
+
 	function store()
 	{	
-		date = Date.now();
-		
-		text = date+ " - " +$("#msg").val();
-	
-		localStorage[date] = text;
-		localStorage["string"] = localStorage["string"]+ JSON.stringify(date)+ ".";
+		haiku = generate_haiku($("#msg").val())
+	    date = Date.now();
+		text = date+ " - " +haiku;
+		storage[date] = text;
+		storage["string"] = storage["string"]+ JSON.stringify(date)+ ".";
+		console.log(storage["string"])
 		reload();
 	}
 	
