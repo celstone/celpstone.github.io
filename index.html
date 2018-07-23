@@ -1,31 +1,55 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
+
 <html>
-	<head>
+
+<head>
+	<title>My News Feed</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+	function reload()
+	{
+		elem = $("#news");
+		output = "";
+		var storeddates = localStorage["string"];
+		var dates = [];
+		temp="";
+		var count = 0;
+		for(i = 9; i < storeddates.length; i++)	{
+			if (storeddates[i] != "."){
+				temp = temp+ storeddates[i];
+				
+			}
+			else{
+				dates.push(temp);
+				temp = "";
+				count = count + 1;
+				
+			}
+	}		
+			for (i = count-1; i >= 0; i--){
+			
+				output = output + "<p>" + localStorage[dates[i]] + "</p>\n";
+			}
+		elem.html(output);
+	}
+	
+	function store()
+	{	
+		date = Date.now();
 		
-
-		<link rel="stylesheet" type="text/css" href="css.css">
-		<title>Maretta Morovitz</title>
-
-<style type="text/css">
-
-</style>
-
+		text = date+ " - " +$("#msg").val();
+	
+		localStorage[date] = text;
+		localStorage["string"] = localStorage["string"]+ JSON.stringify(date)+ ".";
+		reload();
+	}
+	
+	</script>
 </head>
 
-<body>
-
-	<div id="name"><img src="portfolio.png" alt="Profile Picture" ></div>
-	
-	<div id="menubar">
-		<table id="dropmenu">
-		<tr>	
-			<td><a href="bio.html">Biography</a></td>
-			<td><a href="resume.html">Resume</a></td>
-			<td><a href="https://www.linkedin.com/pub/maretta-morovitz/a0/774/138" target="_blank">LinkedIn</a></td>
-		</tr>
-		</table>	
-	</div>
+<body >
+	<h1>My News Feed</h1>
+	<h3>My news update: <input id="msg" type="text" onchange="store()" name="msg" size="30" /></h3>
+	<div id="news">News...</div>
 </body>
 </html>
-
-
